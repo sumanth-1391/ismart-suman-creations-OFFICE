@@ -1,4 +1,791 @@
-<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#0b1020"><title>ISC • ISMART OFFICE</title><link rel="stylesheet" href="style.css"></head><body>
-<div id="toast"></div><div id="modalRoot"></div>
-<section id="login" class="auth"><div class="authCard"><div class="logo">ISC</div><h1>ISMART OFFICE</h1><p>SUMAN CREATIONS · ISMART SUMAN CREATIONS</p><form id="loginForm"><input id="username" placeholder="User ID" required><input id="password" type="password" placeholder="Password" required><button>Sign in</button></form><small>Secure device session · sign out manually</small></div></section>
-<div id="app" class="hide"><aside><div class="brand"><b>ISC</b><span>ISMART OFFICE<small>SUMAN CREATIONS</small></span></div><nav id="nav"></nav><button class="logout" onclick="logout()">↪ Sign out</button></aside><main><header><div><label>ISC OFFICE</label><h2 id="title">Dashboard</h2></div><div class="headRight"><button class="bell" onclick="show('notifications')">🔔<i id="bell"></i></button><div class="user"><b id="userName"></b><small id="userRole"></small></div></div></header><section id="content"></section></main><div id="mobileNav"></div></div><script src="app.js"></script></body></html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>ISC OFFICE</title>
+
+  <link rel="stylesheet" href="/style.css">
+</head>
+
+<body>
+
+<div id="app">
+
+  <!-- ================= HEADER ================= -->
+
+  <header class="topbar">
+
+    <div class="brand">
+
+      <div class="brand-mark">
+        ISC
+      </div>
+
+      <div class="brand-text">
+        <strong>ISMART OFFICE</strong>
+        <span>SUMAN CREATIONS</span>
+      </div>
+
+    </div>
+
+    <div class="top-actions">
+
+      <button
+        class="icon-button"
+        data-page="notifications"
+        title="Notifications"
+      >
+        <span class="svg-icon bell-icon"></span>
+        <span id="notificationBadge" class="badge">0</span>
+      </button>
+
+      <div class="system-status">
+        <span class="status-dot"></span>
+        Online
+      </div>
+
+    </div>
+
+  </header>
+
+
+  <!-- ================= LOGIN ================= -->
+
+  <section id="loginScreen" class="login-screen">
+
+    <div class="login-box">
+
+      <div class="login-logo">
+        ISC
+      </div>
+
+      <h1>ISC OFFICE</h1>
+
+      <p>
+        ISMART SUMAN CREATIONS
+      </p>
+
+      <form id="loginForm">
+
+        <div class="field">
+
+          <label>User ID</label>
+
+          <input
+            id="userId"
+            type="text"
+            placeholder="Enter User ID"
+            required
+          >
+
+        </div>
+
+        <div class="field">
+
+          <label>Password</label>
+
+          <input
+            id="password"
+            type="password"
+            placeholder="Enter Password"
+            required
+          >
+
+        </div>
+
+        <button
+          type="submit"
+          class="main-button full"
+        >
+          LOGIN
+        </button>
+
+      </form>
+
+      <div
+        id="loginMessage"
+        class="message"
+      ></div>
+
+    </div>
+
+  </section>
+
+
+  <!-- ================= APP ================= -->
+
+  <section
+    id="dashboard"
+    class="app-layout hidden"
+  >
+
+    <!-- SIDEBAR -->
+
+    <aside class="sidebar">
+
+      <div class="sidebar-title">
+        OFFICE MENU
+      </div>
+
+
+      <button
+        class="menu-item active"
+        data-page="home"
+      >
+        <span class="menu-icon dashboard-icon"></span>
+        <span>Dashboard</span>
+      </button>
+
+
+      <button
+        class="menu-item"
+        data-page="attendance"
+      >
+        <span class="menu-icon location-icon"></span>
+        <span>Attendance</span>
+      </button>
+
+
+      <button
+        class="menu-item"
+        data-page="team"
+      >
+        <span class="menu-icon users-icon"></span>
+        <span>Team</span>
+      </button>
+
+
+      <button
+        class="menu-item"
+        data-page="salary"
+      >
+        <span class="menu-icon money-icon"></span>
+        <span>Salary</span>
+      </button>
+
+
+      <button
+        class="menu-item"
+        data-page="wallet"
+      >
+        <span class="menu-icon wallet-icon"></span>
+        <span>Wallet</span>
+      </button>
+
+
+      <button
+        class="menu-item"
+        data-page="meetings"
+      >
+        <span class="menu-icon camera-icon"></span>
+        <span>Meetings</span>
+      </button>
+
+
+      <button
+        class="menu-item"
+        data-page="notifications"
+      >
+        <span class="menu-icon bell-icon"></span>
+        <span>Notifications</span>
+      </button>
+
+
+      <div class="sidebar-bottom">
+
+        <button
+          id="logoutBtn"
+          class="logout-button"
+        >
+          <span class="menu-icon logout-icon"></span>
+          <span>Sign Out</span>
+        </button>
+
+      </div>
+
+    </aside>
+
+
+    <!-- MAIN -->
+
+    <main class="main-content">
+
+
+      <!-- DASHBOARD -->
+
+      <section
+        id="page-home"
+        class="page active"
+      >
+
+        <div class="page-title">
+
+          <div>
+            <h2>Dashboard</h2>
+            <p>Welcome to ISC Office Management</p>
+          </div>
+
+          <span class="date-label" id="todayDate"></span>
+
+        </div>
+
+
+        <div class="stats-grid">
+
+          <div class="stat-card">
+
+            <div class="stat-icon blue">
+              <span class="users-icon"></span>
+            </div>
+
+            <div>
+              <span>Team Members</span>
+              <strong id="teamCount">0</strong>
+            </div>
+
+          </div>
+
+
+          <div class="stat-card">
+
+            <div class="stat-icon green">
+              <span class="check-icon"></span>
+            </div>
+
+            <div>
+              <span>Present Today</span>
+              <strong id="presentCount">0</strong>
+            </div>
+
+          </div>
+
+
+          <div class="stat-card">
+
+            <div class="stat-icon gold">
+              <span class="money-icon"></span>
+            </div>
+
+            <div>
+              <span>Admin Wallet</span>
+              <strong id="adminWallet">₹0</strong>
+            </div>
+
+          </div>
+
+
+          <div class="stat-card">
+
+            <div class="stat-icon red">
+              <span class="bell-icon"></span>
+            </div>
+
+            <div>
+              <span>Notifications</span>
+              <strong id="notificationCount">0</strong>
+            </div>
+
+          </div>
+
+        </div>
+
+
+        <div class="dashboard-grid">
+
+          <div class="card">
+
+            <div class="card-header">
+              <div>
+                <h3>Quick Actions</h3>
+                <p>Frequently used office controls</p>
+              </div>
+            </div>
+
+
+            <div class="quick-actions">
+
+              <button
+                class="quick-button"
+                data-page="attendance"
+              >
+                <span class="quick-icon location-icon"></span>
+                <strong>Attendance</strong>
+                <small>Check office attendance</small>
+              </button>
+
+
+              <button
+                class="quick-button"
+                data-page="team"
+              >
+                <span class="quick-icon users-icon"></span>
+                <strong>Team</strong>
+                <small>Manage team members</small>
+              </button>
+
+
+              <button
+                class="quick-button"
+                data-page="wallet"
+              >
+                <span class="quick-icon wallet-icon"></span>
+                <strong>Wallet</strong>
+                <small>Manage office funds</small>
+              </button>
+
+
+              <button
+                class="quick-button"
+                data-page="meetings"
+              >
+                <span class="quick-icon camera-icon"></span>
+                <strong>Meeting</strong>
+                <small>Start internal meeting</small>
+              </button>
+
+            </div>
+
+          </div>
+
+
+          <div class="card">
+
+            <div class="card-header">
+
+              <div>
+                <h3>System Status</h3>
+                <p>Current platform status</p>
+              </div>
+
+            </div>
+
+
+            <div class="status-list">
+
+              <div class="status-row">
+                <span>Backend</span>
+                <b class="online-text">ONLINE</b>
+              </div>
+
+              <div class="status-row">
+                <span>Attendance</span>
+                <b class="online-text">READY</b>
+              </div>
+
+              <div class="status-row">
+                <span>Wallet</span>
+                <b class="online-text">READY</b>
+              </div>
+
+              <div class="status-row">
+                <span>Meetings</span>
+                <b class="online-text">READY</b>
+              </div>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </section>
+
+
+      <!-- ATTENDANCE -->
+
+      <section
+        id="page-attendance"
+        class="page"
+      >
+
+        <div class="page-title">
+
+          <div>
+            <h2>Attendance</h2>
+            <p>Office proximity attendance system</p>
+          </div>
+
+        </div>
+
+
+        <div class="attendance-container">
+
+          <div class="card attendance-card">
+
+            <div class="scanner">
+
+              <div class="scanner-ring ring-one"></div>
+              <div class="scanner-ring ring-two"></div>
+              <div class="scanner-ring ring-three"></div>
+
+              <div class="scanner-dot"></div>
+
+            </div>
+
+
+            <h3>OFFICE LOCATION</h3>
+
+            <p id="locationStatus">
+              Ready to check your location
+            </p>
+
+
+            <div class="attendance-actions">
+
+              <button
+                id="checkInBtn"
+                class="main-button"
+              >
+                CHECK IN
+              </button>
+
+              <button
+                id="checkOutBtn"
+                class="danger-button"
+              >
+                CHECK OUT
+              </button>
+
+            </div>
+
+          </div>
+
+
+          <div class="card">
+
+            <div class="card-header">
+
+              <div>
+                <h3>Attendance Rules</h3>
+                <p>Office verification requirements</p>
+              </div>
+
+            </div>
+
+
+            <div class="rule-list">
+
+              <div class="rule">
+                <span class="check-circle">✓</span>
+                <span>Must be within 50 meters</span>
+              </div>
+
+              <div class="rule">
+                <span class="check-circle">✓</span>
+                <span>Admin transmitter must be active</span>
+              </div>
+
+              <div class="rule">
+                <span class="check-circle">✓</span>
+                <span>Checkout requires 5 hours</span>
+              </div>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </section>
+
+
+      <!-- TEAM -->
+
+      <section
+        id="page-team"
+        class="page"
+      >
+
+        <div class="page-title">
+
+          <div>
+            <h2>Team Management</h2>
+            <p>Create and manage ISC team members</p>
+          </div>
+
+          <button
+            id="addTeamBtn"
+            class="main-button"
+          >
+            + ADD MEMBER
+          </button>
+
+        </div>
+
+
+        <div class="card">
+
+          <div class="empty-state">
+
+            <div class="empty-icon users-icon"></div>
+
+            <h3>No Team Members</h3>
+
+            <p>
+              Add your first team member to begin.
+            </p>
+
+            <button
+              class="main-button"
+              id="emptyAddTeamBtn"
+            >
+              ADD TEAM MEMBER
+            </button>
+
+          </div>
+
+        </div>
+
+      </section>
+
+
+      <!-- SALARY -->
+
+      <section
+        id="page-salary"
+        class="page"
+      >
+
+        <div class="page-title">
+
+          <div>
+            <h2>Salary</h2>
+            <p>Team salary management</p>
+          </div>
+
+        </div>
+
+
+        <div class="salary-grid">
+
+          <div class="card salary-main">
+
+            <span class="small-label">
+              CURRENT DAILY RATE
+            </span>
+
+            <strong class="salary-number">
+              ₹50
+            </strong>
+
+            <span class="salary-note">
+              Per team member per working day
+            </span>
+
+          </div>
+
+
+          <div class="card">
+
+            <h3>Salary System</h3>
+
+            <div class="status-row">
+              <span>Daily payment</span>
+              <b>₹50</b>
+            </div>
+
+            <div class="status-row">
+              <span>Calculation</span>
+              <b>Automatic</b>
+            </div>
+
+          </div>
+
+        </div>
+
+      </section>
+
+
+      <!-- WALLET -->
+
+      <section
+        id="page-wallet"
+        class="page"
+      >
+
+        <div class="page-title">
+
+          <div>
+            <h2>Wallet</h2>
+            <p>Admin wallet and recharge management</p>
+          </div>
+
+          <button
+            id="adjustWalletBtn"
+            class="main-button"
+          >
+            ADJUST WALLET
+          </button>
+
+        </div>
+
+
+        <div class="wallet-grid">
+
+          <div class="wallet-card">
+
+            <span>ADMIN WALLET</span>
+
+            <strong id="walletAmount">
+              ₹0
+            </strong>
+
+            <small>
+              Available office funds
+            </small>
+
+          </div>
+
+
+          <div class="wallet-card secondary">
+
+            <span>TEAM WALLET</span>
+
+            <strong>
+              ₹0
+            </strong>
+
+            <small>
+              Current team balance
+            </small>
+
+          </div>
+
+        </div>
+
+      </section>
+
+
+      <!-- MEETINGS -->
+
+      <section
+        id="page-meetings"
+        class="page"
+      >
+
+        <div class="page-title">
+
+          <div>
+            <h2>Internal Meetings</h2>
+            <p>ISC private meeting platform</p>
+          </div>
+
+        </div>
+
+
+        <div class="card meeting-card">
+
+          <div class="meeting-icon">
+            <span class="camera-icon"></span>
+          </div>
+
+          <h3>ISC Internal Meeting</h3>
+
+          <p>
+            Start a private internal camera and
+            microphone meeting for your team.
+          </p>
+
+          <a
+            href="/meeting.html"
+            class="main-button link-button"
+          >
+            OPEN MEETING
+          </a>
+
+        </div>
+
+      </section>
+
+
+      <!-- NOTIFICATIONS -->
+
+      <section
+        id="page-notifications"
+        class="page"
+      >
+
+        <div class="page-title">
+
+          <div>
+            <h2>Notifications</h2>
+            <p>Recent ISC Office alerts</p>
+          </div>
+
+          <button
+            id="clearNotificationsBtn"
+            class="secondary-button"
+          >
+            CLEAR HISTORY
+          </button>
+
+        </div>
+
+
+        <div
+          id="notificationsList"
+          class="card"
+        >
+
+          <div class="empty-state">
+
+            <div class="empty-icon bell-icon"></div>
+
+            <h3>No Notifications</h3>
+
+            <p>
+              New office notifications will appear here.
+            </p>
+
+          </div>
+
+        </div>
+
+      </section>
+
+
+    </main>
+
+  </section>
+
+
+  <!-- ================= MODAL ================= -->
+
+  <div
+    id="modalOverlay"
+    class="modal-overlay hidden"
+  >
+
+    <div class="modal">
+
+      <div class="modal-header">
+
+        <h3 id="modalTitle">
+          Add Team Member
+        </h3>
+
+        <button
+          id="closeModalBtn"
+          class="close-button"
+        >
+          ×
+        </button>
+
+      </div>
+
+
+      <div id="modalBody">
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <script src="/app.js"></script>
+
+</body>
+</html>

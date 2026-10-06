@@ -1,27 +1,81 @@
-<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#080b14"><title>ISC Office Meeting</title><style>
-*{box-sizing:border-box}body{margin:0;background:#080b14;color:#f5f7fb;font-family:Inter,system-ui,Arial;min-height:100vh}.top{height:64px;display:flex;align-items:center;justify-content:space-between;padding:0 18px;border-bottom:1px solid #222838;background:#0d111d;position:sticky;top:0;z-index:5}.brand{display:flex;gap:10px;align-items:center}.logo{width:38px;height:38px;border-radius:11px;background:#fff;color:#080b14;display:grid;place-items:center;font-weight:900}.muted{color:#98a2b3;font-size:13px}.wrap{padding:16px;max-width:1400px;margin:auto}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px}.videoCard{position:relative;background:#111725;border:1px solid #242b3c;border-radius:16px;overflow:hidden;min-height:220px}.videoCard video{width:100%;height:100%;min-height:220px;object-fit:cover;background:#05070b}.tag{position:absolute;left:10px;top:10px;background:#000a;padding:7px 9px;border-radius:9px;font-size:12px}.controls{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);display:flex;gap:8px;padding:9px;background:#0d111ddd;border:1px solid #2a3142;border-radius:18px;backdrop-filter:blur(14px);z-index:10}.btn{border:0;border-radius:12px;padding:11px 14px;background:#202738;color:#fff;font-weight:700;cursor:pointer}.btn.primary{background:#fff;color:#080b14}.btn.danger{background:#8b2434}.status{padding:12px 14px;border:1px solid #242b3c;border-radius:14px;background:#0d111d;margin-bottom:14px}.panel{background:#0d111d;border:1px solid #242b3c;border-radius:16px;padding:14px;margin-bottom:14px}.hide{display:none}@media(max-width:600px){.top{height:58px;padding:0 12px}.wrap{padding:10px}.grid{grid-template-columns:1fr}.videoCard,.videoCard video{min-height:210px}.controls{bottom:10px;width:calc(100% - 18px);justify-content:center;flex-wrap:wrap}.btn{padding:10px 11px}.meetingTitle{max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}}
-</style></head><body><header class="top"><div class="brand"><div class="logo">ISC</div><div><b>ISC OFFICE</b><div class="muted meetingTitle" id="title">Private meeting</div></div></div><button class="btn" onclick="leave()">Leave</button></header><main class="wrap"><div id="status" class="status">Connecting to ISC meeting room…</div><div id="videos" class="grid"></div><div class="panel"><b>ISC Office Meeting</b><div class="muted">This room is hosted by the ISC Office application. Camera, microphone and meeting signaling stay inside this platform. WebRTC carries live media directly between participants.</div></div></main><div class="controls"><button class="btn" id="mute" onclick="toggleMute()">🎙 Mute</button><button class="btn" id="cam" onclick="toggleCam()">📷 Camera</button><button class="btn" onclick="flipCamera()">🔄 Flip</button><button class="btn" onclick="torch()">🔦 Torch</button><button class="btn" onclick="shareScreen()">🖥 Share</button><button class="btn" id="rec" onclick="record()">⏺ Record</button><button class="btn primary" onclick="leave()">Exit</button></div>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ISC Internal Meeting</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand">
+    <div class="logo">ISC</div>
+    <div>
+      <h1>ISC INTERNAL MEETING</h1>
+      <p>SUMAN CREATIONS</p>
+    </div>
+  </div>
+</header>
+
+<main class="content">
+  <div class="page-header">
+    <div>
+      <h2>Internal Meeting</h2>
+      <p>ISC private meeting platform</p>
+    </div>
+  </div>
+
+  <div class="panel">
+    <h3>Camera & Microphone</h3>
+
+    <video
+      id="localVideo"
+      autoplay
+      muted
+      playsinline
+      style="width:100%;max-width:900px;border-radius:16px;background:#000;"
+    ></video>
+
+    <div>
+      <button id="startCamera" class="primary-btn">
+        START CAMERA
+      </button>
+
+      <button id="stopCamera" class="danger-btn">
+        STOP CAMERA
+      </button>
+    </div>
+  </div>
+</main>
+
 <script>
-const qs=new URLSearchParams(location.search),meetingId=qs.get('id'),userId=localStorage.getItem('iscDeviceSession');let meeting,stream,muted=false,camOn=true,front=true,peers=new Map(),lastSignal=0,recorder,chunks=[];
-const $=x=>document.querySelector(x);const api=async(url,opt={})=>{let r=await fetch(url,opt),d=await r.json().catch(()=>({}));if(!r.ok)throw Error(d.error||'Request failed');return d};
-function status(x){$('#status').textContent=x}
-function addVideo(id,name,src,local=false){let c=document.createElement('div');c.className='videoCard';c.id='v_'+id;c.innerHTML=`<span class="tag">${local?'You':name||'Participant'}</span><video autoplay playsinline ${local?'muted':''}></video>`;$('#videos').appendChild(c);c.querySelector('video').srcObject=src;return c.querySelector('video')}
-async function init(){if(!meetingId||!userId){status('Invalid ISC meeting link.');return}try{let d=await api('/api/meeting/get?meetingId='+encodeURIComponent(meetingId)+'&userId='+encodeURIComponent(userId));meeting=d.meeting;$('#title').textContent=meeting.title;stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:'user',width:{ideal:1280},height:{ideal:720}},audio:true});addVideo(userId,'You',stream,true);status('Connected · waiting for participants');await announce();setInterval(poll,900);setInterval(announce,3000)}catch(e){status(e.message)}}
-async function announce(){try{await api('/api/meeting/signal',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({meetingId,from:userId,type:'hello',payload:{name:userId}})})}catch(e){}}
-async function signal(to,type,payload){await api('/api/meeting/signal',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({meetingId,from:userId,to,type,payload})})}
-async function poll(){try{let d=await api('/api/meeting/signals?meetingId='+encodeURIComponent(meetingId)+'&userId='+encodeURIComponent(userId)+'&after='+lastSignal);for(const s of d.signals){lastSignal=Math.max(lastSignal,s.createdAt);if(s.type==='hello')await makeOffer(s.from);else if(s.type==='offer')await receiveOffer(s.from,s.payload);else if(s.type==='answer')await receiveAnswer(s.from,s.payload);else if(s.type==='candidate')await candidate(s.from,s.payload);else if(s.type==='leave')removePeer(s.from)}}catch(e){}}
-function pcFor(id){if(peers.has(id))return peers.get(id);let pc=new RTCPeerConnection({iceServers:[]});stream.getTracks().forEach(t=>pc.addTrack(t,stream));pc.onicecandidate=e=>e.candidate&&signal(id,'candidate',e.candidate);pc.ontrack=e=>{let v=$('#v_'+id)?.querySelector('video');if(!v){v=addVideo(id,id,e.streams[0])}else v.srcObject=e.streams[0]};pc.onconnectionstatechange=()=>{if(['failed','closed','disconnected'].includes(pc.connectionState))removePeer(id)};peers.set(id,pc);return pc}
-async function makeOffer(id){if(id===userId)return;let pc=pcFor(id);let o=await pc.createOffer();await pc.setLocalDescription(o);await signal(id,'offer',o)}
-async function receiveOffer(id,o){let pc=pcFor(id);await pc.setRemoteDescription(o);let a=await pc.createAnswer();await pc.setLocalDescription(a);await signal(id,'answer',a)}
-async function receiveAnswer(id,a){let pc=pcFor(id);if(pc.signalingState!=='stable')await pc.setRemoteDescription(a)}
-async function candidate(id,c){try{await pcFor(id).addIceCandidate(c)}catch(e){}}
-function removePeer(id){peers.get(id)?.close();peers.delete(id);$('#v_'+id)?.remove()}
-function toggleMute(){muted=!muted;stream.getAudioTracks().forEach(t=>t.enabled=!muted);$('#mute').textContent=muted?'🔇 Unmute':'🎙 Mute'}
-function toggleCam(){camOn=!camOn;stream.getVideoTracks().forEach(t=>t.enabled=camOn);$('#cam').textContent=camOn?'📷 Camera':'🚫 Camera'}
-async function flipCamera(){front=!front;let old=stream.getVideoTracks()[0];let ns=await navigator.mediaDevices.getUserMedia({video:{facingMode:front?'user':'environment'},audio:false});let nt=ns.getVideoTracks()[0];for(const pc of peers.values()){let sender=pc.getSenders().find(s=>s.track===old);if(sender)await sender.replaceTrack(nt)}old.stop();stream.removeTrack(old);stream.addTrack(nt);$('#v_'+userId+' video')?.srcObject=stream}
-async function torch(){let t=stream.getVideoTracks()[0];try{let c=t.getCapabilities();if(!c.torch){status('Torch is not supported by this device/browser.');return}await t.applyConstraints({advanced:[{torch:true}]});status('Torch enabled; use again to request browser/device toggle.')}catch(e){status('Torch is not available on this camera.')}}
-async function shareScreen(){try{let s=await navigator.mediaDevices.getDisplayMedia({video:true});let st=s.getVideoTracks()[0];for(const pc of peers.values()){let sender=pc.getSenders().find(x=>x.track&&x.track.kind==='video');if(sender)await sender.replaceTrack(st)}st.onended=()=>flipCamera()}catch(e){}}
-function record(){if(recorder?.state==='recording'){recorder.stop();$('#rec').textContent='⏺ Record';return}chunks=[];recorder=new MediaRecorder(stream);recorder.ondataavailable=e=>e.data.size&&chunks.push(e.data);recorder.onstop=()=>{let a=document.createElement('a');a.href=URL.createObjectURL(new Blob(chunks,{type:'video/webm'}));a.download='ISC-'+meetingId+'-'+Date.now()+'.webm';a.click()};recorder.start();$('#rec').textContent='⏹ Stop & download'}
-async function leave(){try{await signal(null,'leave',{})}catch(e){}stream?.getTracks().forEach(t=>t.stop());peers.forEach(p=>p.close());location.href='/'}
-init();
-</script></body></html>
+let stream = null;
+
+const video = document.getElementById("localVideo");
+
+document.getElementById("startCamera").addEventListener("click", async () => {
+  try {
+    stream = await navigator.mediaDevices.getUserMedia({
+      video: true,
+      audio: true
+    });
+
+    video.srcObject = stream;
+  } catch (error) {
+    alert("Camera/Microphone permission failed: " + error.message);
+  }
+});
+
+document.getElementById("stopCamera").addEventListener("click", () => {
+  if (!stream) return;
+
+  stream.getTracks().forEach(track => track.stop());
+
+  video.srcObject = null;
+  stream = null;
+});
+</script>
+
+</body>
+</html>
