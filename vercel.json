@@ -1,6 +1,11 @@
 {
-  "version": 2,
-  "functions": {
-    "api/index.js": { "runtime": "nodejs24.x" }
+  "name": "isc-office",
+  "version": "4.0.0",
+  "private": true,
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": "24.x"
   }
 }
