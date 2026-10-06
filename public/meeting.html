@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ISC Internal Meeting</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand">
+    <div class="logo">ISC</div>
+    <div>
+      <h1>ISC INTERNAL MEETING</h1>
+      <p>SUMAN CREATIONS</p>
+    </div>
+  </div>
+</header>
+
+<main class="content">
+  <div class="page-header">
+    <div>
+      <h2>Internal Meeting</h2>
+      <p>ISC private meeting platform</p>
+    </div>
+  </div>
+
+  <div class="panel">
+    <h3>Camera & Microphone</h3>
+
+    <video
+      id="localVideo"
+      autoplay
+      muted
+      playsinline
+      style="width:100%;max-width:900px;border-radius:16px;background:#000;"
+    ></video>
+
+    <div>
+      <button id="startCamera" class="primary-btn">
+        START CAMERA
+      </button>
+
+      <button id="stopCamera" class="danger-btn">
+        STOP CAMERA
+      </button>
+    </div>
+  </div>
+</main>
+
+<script>
+let stream = null;
+
+const video = document.getElementById("localVideo");
+
+document.getElementById("startCamera").addEventListener("click", async () => {
+  try {
+    stream = await navigator.mediaDevices.getUserMedia({
+      video: true,
+      audio: true
+    });
+
+    video.srcObject = stream;
+  } catch (error) {
+    alert("Camera/Microphone permission failed: " + error.message);
+  }
+});
+
+document.getElementById("stopCamera").addEventListener("click", () => {
+  if (!stream) return;
+
+  stream.getTracks().forEach(track => track.stop());
+
+  video.srcObject = null;
+  stream = null;
+});
+</script>
+
+</body>
+</html>
